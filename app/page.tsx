@@ -3,9 +3,13 @@
 import { useEffect, useState, FormEvent } from "react";
 import { insforge } from "@/lib/insforge";
 import { Trash2, Edit2, X, LogOut, User, Search, Filter } from "lucide-react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import DashboardCharts from "@/components/DashboardCharts";
+import SmartInput from "@/components/SmartInput";
+import FloatingAdvisor from "@/components/FloatingAdvisor";
 
 type Transaction = {
   id: string;
@@ -42,6 +46,22 @@ export default function Dashboard() {
       const { data } = await insforge.auth.getCurrentUser();
       if (data.user) {
         setCurrentUser(data.user);
+        
+        // Ensure user exists in public.users table to satisfy foreign key constraints
+        const { data: existingUsers } = await insforge.database
+          .from("users")
+          .select("id")
+          .eq("id", data.user.id)
+          .limit(1);
+          
+        if (!existingUsers || existingUsers.length === 0) {
+          const { error: insertErr } = await insforge.database.from("users").insert({
+            id: data.user.id,
+            email: data.user.email,
+          });
+          if (insertErr) console.error("Error sincando usuario:", insertErr);
+        }
+
         fetchTransactions(data.user.id);
       } else {
         router.push("/login");
@@ -88,9 +108,10 @@ export default function Dashboard() {
       if (!error) {
         cancelEdit();
         fetchTransactions(currentUser.id);
+        toast.success("Transacción actualizada exitosamente");
       } else {
         console.error(error);
-        alert("Error actualizando la transacción.");
+        toast.error("Error actualizando la transacción.");
       }
     } else {
       const { error } = await insforge.database.from("transactions").insert({
@@ -104,9 +125,10 @@ export default function Dashboard() {
         setAmount("");
         setCategory("");
         fetchTransactions(currentUser.id);
+        toast.success("Transacción guardada exitosamente");
       } else {
         console.error(error);
-        alert("Error guardando la transacción.");
+        toast.error("Error guardando la transacción.");
       }
     }
   };
@@ -122,9 +144,10 @@ export default function Dashboard() {
 
     if (!error) {
       fetchTransactions(currentUser.id);
+      toast.success("Transacción eliminada");
     } else {
       console.error(error);
-      alert("Error eliminando la transacción.");
+      toast.error("Error eliminando la transacción.");
     }
   };
 
@@ -195,6 +218,9 @@ export default function Dashboard() {
             ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
+
+        {/* Input Inteligente impulsado por LM Studio */}
+        <SmartInput currentUser={currentUser} onTransactionAdded={() => currentUser && fetchTransactions(currentUser.id)} />
 
         <DashboardCharts transactions={filteredTransactions} />
 
@@ -327,8 +353,11 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {filteredTransactions.map((t) => (
-                  <div
+                {filteredTransactions.map((t, idx) => (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
                     key={t.id}
                     className={`group flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 rounded-2xl bg-neutral-950 border transition-all duration-300 gap-4 ${
                       editingId === t.id 
@@ -379,7 +408,7 @@ export default function Dashboard() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -387,6 +416,9 @@ export default function Dashboard() {
 
         </div>
       </div>
+      
+      {/* Botón y Chat Flotante del Asesor */}
+      <FloatingAdvisor currentUser={currentUser} />
     </main>
   );
 }

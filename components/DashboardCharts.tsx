@@ -1,6 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { motion } from "framer-motion";
 
 type Transaction = {
   id: string;
@@ -49,13 +50,18 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
   if (transactions.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-2">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-2"
+    >
       {/* Gráfico Circular (Gastos) */}
       <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700">
         <h3 className="text-neutral-400 font-medium mb-2 text-center">Distribución de Gastos</h3>
         <div className="flex-grow w-full relative">
           {pieData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minHeight={200} minWidth={200}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -72,7 +78,7 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => `$${value.toLocaleString("es-US", { minimumFractionDigits: 2 })}`}
+                  formatter={(value: any) => `$${Number(value).toLocaleString("es-US", { minimumFractionDigits: 2 })}`}
                   contentStyle={{ backgroundColor: "rgba(23, 23, 23, 0.9)", backdropFilter: "blur(8px)", borderColor: "#404040", borderRadius: "16px", color: "#f5f5f5", boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)" }}
                   itemStyle={{ color: "#e5e5e5", fontWeight: "bold" }}
                 />
@@ -88,14 +94,14 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
       {/* Gráfico de Barras (Resumen) */}
       <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700">
         <h3 className="text-neutral-400 font-medium mb-4 text-center">Balance Mensual</h3>
-        <div className="flex-grow w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="flex-grow w-full relative">
+          <ResponsiveContainer width="100%" height="100%" minHeight={200} minWidth={200}>
             <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <XAxis dataKey="name" stroke="#737373" fontSize={12} tickLine={false} axisLine={false} />
               <YAxis stroke="#737373" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val >= 1000 ? (val/1000).toFixed(1)+'k' : val}`} />
               <Tooltip 
                 cursor={{ fill: '#262626', opacity: 0.5, rx: 8 }}
-                formatter={(value: number) => `$${value.toLocaleString("es-US", { minimumFractionDigits: 2 })}`}
+                formatter={(value: any) => `$${Number(value).toLocaleString("es-US", { minimumFractionDigits: 2 })}`}
                 contentStyle={{ backgroundColor: "rgba(23, 23, 23, 0.9)", backdropFilter: "blur(8px)", borderColor: "#404040", borderRadius: "16px", color: "#f5f5f5", boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)" }}
               />
               <Bar dataKey="valor" radius={[8, 8, 8, 8]} barSize={60} className="drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
@@ -103,6 +109,6 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
           </ResponsiveContainer>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -34,31 +34,19 @@ export default function Profile() {
     router.push("/login");
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePasswordResetRequest = async () => {
     setStatusMsg({ type: "", text: "" });
-
-    if (newPassword !== confirmPassword) {
-      setStatusMsg({ type: "error", text: "Las contraseñas no coinciden." });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setStatusMsg({ type: "error", text: "La contraseña debe tener al menos 6 caracteres." });
-      return;
-    }
-
     setIsUpdating(true);
     
-    // Método oficial para actualizar usuario autenticado
-    const { error } = await insforge.auth.updateUser({ password: newPassword });
+    const { error } = await insforge.auth.sendResetPasswordEmail({
+      email: user.email,
+      redirectTo: window.location.origin + "/reset-password",
+    });
     
     if (error) {
-      setStatusMsg({ type: "error", text: error.message || "Error al actualizar la contraseña." });
+      setStatusMsg({ type: "error", text: error.message || "Error al solicitar el cambio de contraseña." });
     } else {
-      setStatusMsg({ type: "success", text: "Contraseña actualizada exitosamente." });
-      setNewPassword("");
-      setConfirmPassword("");
+      setStatusMsg({ type: "success", text: "Te hemos enviado un correo con las instrucciones para restablecer tu contraseña." });
     }
     
     setIsUpdating(false);
@@ -114,7 +102,7 @@ export default function Profile() {
         <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-8 border border-neutral-800 shadow-xl relative mt-2">
           <h2 className="text-xl font-semibold mb-6 text-neutral-100 flex items-center gap-2">
             <Lock size={20} className="text-emerald-500" />
-            Cambiar Contraseña
+            Seguridad
           </h2>
 
           {statusMsg.text && (
@@ -127,39 +115,16 @@ export default function Profile() {
             </div>
           )}
 
-          <form onSubmit={handleChangePassword} className="flex flex-col gap-5">
-            <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-2">Nueva Contraseña</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-neutral-100 placeholder:text-neutral-600"
-                placeholder="Mínimo 6 caracteres"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-neutral-400 mb-2">Confirmar Nueva Contraseña</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-neutral-100 placeholder:text-neutral-600"
-                placeholder="Repite la contraseña"
-                required
-              />
-            </div>
-
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-neutral-400 mb-2">Para proteger tu cuenta, los cambios de contraseña requieren verificación por correo electrónico.</p>
             <button
-              type="submit"
+              onClick={handlePasswordResetRequest}
               disabled={isUpdating}
-              className="mt-4 w-full bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] shadow-[0_0_20px_-5px_rgba(16,185,129,0.4)] disabled:opacity-50 disabled:pointer-events-none"
+              className="mt-2 w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
             >
-              {isUpdating ? "Actualizando..." : "Actualizar Contraseña"}
+              {isUpdating ? "Enviando..." : "Solicitar Cambio de Contraseña"}
             </button>
-          </form>
+          </div>
         </div>
 
       </div>
