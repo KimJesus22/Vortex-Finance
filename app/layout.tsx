@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import PWA from "@/components/PWA";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,7 +40,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
-        <PWA />
         <Toaster theme="dark" position="bottom-right" richColors />
       </body>
     </html>
