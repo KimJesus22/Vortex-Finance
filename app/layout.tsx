@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import PWA from "@/components/PWA";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +17,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vortex Finance | Gestión Financiera Inteligente",
   description: "Controla tus ingresos y gastos familiares en tiempo real de forma segura. Desarrollado con Next.js e InsForge.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Vortex Finance",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
@@ -30,6 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
+        <PWA />
         <Toaster theme="dark" position="bottom-right" richColors />
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { insforge } from "@/lib/insforge";
-import { Trash2, Edit2, X, LogOut, User, Search, Filter } from "lucide-react";
+import { Trash2, Edit2, X, LogOut, User, Search, Filter, Download } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -175,6 +175,35 @@ export default function Dashboard() {
     return matchesSearch && matchesType && matchesMonth;
   });
 
+  const exportToCSV = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error("No hay transacciones para exportar");
+      return;
+    }
+
+    let csvContent = "Fecha,Categoría,Tipo,Monto\n";
+
+    filteredTransactions.forEach((t) => {
+      const date = new Date(t.created_at).toLocaleDateString("es-US");
+      const category = `"${t.category.replace(/"/g, '""')}"`;
+      const type = t.type;
+      const amount = t.amount;
+      csvContent += `${date},${category},${type},${amount}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `vortex_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Historial exportado a CSV");
+  };
+
   const currentBalance = filteredTransactions.reduce((acc, curr) => {
     return curr.type === "ingreso" ? acc + Number(curr.amount) : acc - Number(curr.amount);
   }, 0);
@@ -340,6 +369,15 @@ export default function Dashboard() {
                 <option value="10">Noviembre</option>
                 <option value="11">Diciembre</option>
               </select>
+              
+              <button
+                onClick={exportToCSV}
+                className="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-neutral-200 flex items-center justify-center gap-2 active:scale-95"
+                title="Exportar a CSV"
+              >
+                <Download size={16} className="text-emerald-500" />
+                <span className="hidden sm:inline">Exportar</span>
+              </button>
             </div>
 
             {loading ? (
