@@ -2,8 +2,10 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { insforge } from "@/lib/insforge";
-import { Trash2, Edit2, X, LogOut } from "lucide-react";
+import { Trash2, Edit2, X, LogOut, User, Search, Filter } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import DashboardCharts from "@/components/DashboardCharts";
 
 type Transaction = {
   id: string;
@@ -20,7 +22,6 @@ export default function Dashboard() {
   const [authChecking, setAuthChecking] = useState(true);
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
 
   // Form state
@@ -30,6 +31,11 @@ export default function Dashboard() {
   
   // Edit state
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<"todos" | "ingreso" | "gasto">("todos");
+  const [filterMonth, setFilterMonth] = useState<string>("todos");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,12 +61,6 @@ export default function Dashboard() {
 
     if (!error && data) {
       setTransactions(data as Transaction[]);
-      const total = data.reduce((acc: number, curr: any) => {
-        return curr.type === "ingreso"
-          ? acc + Number(curr.amount)
-          : acc - Number(curr.amount);
-      }, 0);
-      setBalance(total);
     }
     setLoading(false);
   };
@@ -143,6 +143,19 @@ export default function Dashboard() {
     setType("ingreso");
   };
 
+  // Derived state for filtering
+  const filteredTransactions = transactions.filter(t => {
+    const matchesSearch = t.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === "todos" ? true : t.type === filterType;
+    const transactionMonth = new Date(t.created_at).getMonth().toString(); // 0-11
+    const matchesMonth = filterMonth === "todos" ? true : transactionMonth === filterMonth;
+    return matchesSearch && matchesType && matchesMonth;
+  });
+
+  const currentBalance = filteredTransactions.reduce((acc, curr) => {
+    return curr.type === "ingreso" ? acc + Number(curr.amount) : acc - Number(curr.amount);
+  }, 0);
+
   if (authChecking) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
@@ -157,8 +170,11 @@ export default function Dashboard() {
         
         {/* Cabecera del Usuario */}
         <div className="flex justify-between items-center px-2">
-          <div className="text-neutral-400 text-sm">
-            Hola, <span className="text-neutral-100 font-medium">{currentUser?.profile?.name || currentUser?.email}</span>
+          <div className="flex items-center gap-3 text-neutral-400 text-sm">
+            <Link href="/profile" className="p-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-full border border-emerald-500/20 transition-colors" title="Ver Perfil">
+              <User size={18} />
+            </Link>
+            <span>Hola, <span className="text-neutral-100 font-medium">{currentUser?.profile?.name || currentUser?.email}</span></span>
           </div>
           <button 
             onClick={handleLogout}
@@ -168,15 +184,19 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Panel Superior: Balance Total */}
+        {/* Panel Superior: Balance Total Dinámico */}
         <div className="bg-neutral-900 rounded-3xl p-8 md:p-10 border border-neutral-800 shadow-2xl text-center relative overflow-hidden group">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none"></div>
           
-          <h1 className="text-lg md:text-xl text-neutral-400 font-medium mb-3 relative z-10">Balance Total</h1>
-          <p className={`text-6xl md:text-7xl font-bold tracking-tight relative z-10 transition-colors duration-500 ${balance >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-            ${balance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <h1 className="text-lg md:text-xl text-neutral-400 font-medium mb-3 relative z-10">
+            {searchQuery || filterType !== "todos" || filterMonth !== "todos" ? "Balance de Selección" : "Balance Total"}
+          </h1>
+          <p className={`text-6xl md:text-7xl font-bold tracking-tight relative z-10 transition-colors duration-500 ${currentBalance >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+            ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
+
+        <DashboardCharts transactions={filteredTransactions} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
           
@@ -251,20 +271,63 @@ export default function Dashboard() {
           </div>
 
           {/* Lista de Historial */}
-          <div className="lg:col-span-2 bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-neutral-800 shadow-xl">
-            <h2 className="text-xl font-semibold mb-6 text-neutral-100">Historial</h2>
+          <div className="lg:col-span-2 bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-neutral-800 shadow-xl flex flex-col">
+            <h2 className="text-xl font-semibold mb-4 text-neutral-100">Historial</h2>
             
+            {/* Filtros */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6 bg-neutral-950/50 p-3 rounded-2xl border border-neutral-800">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
+                <input 
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-neutral-200"
+                />
+              </div>
+              <select
+                value={filterType}
+                onChange={e => setFilterType(e.target.value as any)}
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-neutral-200 appearance-none"
+              >
+                <option value="todos">Todos los Tipos</option>
+                <option value="ingreso">Ingresos</option>
+                <option value="gasto">Gastos</option>
+              </select>
+              <select
+                value={filterMonth}
+                onChange={e => setFilterMonth(e.target.value)}
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-neutral-200 appearance-none"
+              >
+                <option value="todos">Meses</option>
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+              </select>
+            </div>
+
             {loading ? (
-              <div className="flex justify-center items-center py-20">
+              <div className="flex flex-1 justify-center items-center py-20">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
-            ) : transactions.length === 0 ? (
-              <div className="text-center text-neutral-500 py-16 flex flex-col items-center justify-center">
-                <p>No hay transacciones aún.</p>
+            ) : filteredTransactions.length === 0 ? (
+              <div className="text-center text-neutral-500 flex-1 py-16 flex flex-col items-center justify-center">
+                <Filter className="w-12 h-12 text-neutral-800 mb-3" />
+                <p>No hay transacciones que coincidan.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {transactions.map((t) => (
+                {filteredTransactions.map((t) => (
                   <div
                     key={t.id}
                     className={`group flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 rounded-2xl bg-neutral-950 border transition-all duration-300 gap-4 ${

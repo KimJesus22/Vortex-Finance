@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vortex Finance",
-  description: "Plataforma de finanzas personales para tu familia.",
+  title: "Vortex Finance | Gestión Financiera Inteligente",
+  description: "Controla tus ingresos y gastos familiares en tiempo real de forma segura. Desarrollado con Next.js e InsForge.",
 };
 
 export default function RootLayout({
