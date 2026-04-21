@@ -174,7 +174,6 @@ export default function Profile() {
               {isUpdating ? "Enviando..." : "Solicitar Cambio de Contraseña"}
             </button>
           </div>
-          </div>
         </div>
 
         {/* Sección Oculta: Roast de la IA */}

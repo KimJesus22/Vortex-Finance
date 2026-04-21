@@ -8,13 +8,18 @@ Vortex Finance es una plataforma moderna de gestión financiera diseñada para f
 
 ## ✨ Características Principales
 
-- **🛡️ Autenticación Multi-usuario:** Sistema de registro y login seguro gestionado por InsForge. Cada usuario tiene su propio espacio de trabajo cifrado.
-- **🤖 Asesor de IA Local (Vortex AI):** Integración nativa con **LM Studio** corriendo modelos de forma local (ej. Gemma 4, Llama 3) garantizando privacidad absoluta (0% datos a servidores externos). La IA procesa transacciones en lote (JSON arrays) y actúa como un asesor financiero contextual.
+- **🛡️ Autenticación y Seguridad RLS:** Sistema de registro y login seguro gestionado por InsForge. Cada usuario tiene su propio espacio de trabajo cifrado garantizado mediante Row Level Security (RLS) a nivel de base de datos.
+- **🤖 Vortex AI (Gemma 4 Local):** Integración nativa con **LM Studio** garantizando privacidad absoluta (0% datos a servidores externos). Cuenta con 3 modos: **Categorizador** (procesa transacciones a JSON estricto), **Chatbot Asesor** (guía financiera) y **Roast Mode** (crítica sarcástica y brutal de tus hábitos de gasto).
+- **✈️ Viajes Compartidos:** Módulo colaborativo para dividir gastos con amigos equitativamente.
+- **💳 Control de Deudas:** Gestor integrado para rastrear tarjetas y préstamos con progreso de liquidación visual en tiempo real.
+- **🔁 Suscripciones y Gastos Fijos:** Automatización de flujos recurrentes con *Bulk Inserts* mensuales.
+- **📑 Análisis Zero-Knowledge (PDF):** Lector de Buró de Crédito que extrae datos 100% en el cliente (`pdfjs-dist`) sin enviar archivos a ningún servidor.
+- **🔥 Gamificación (Streaks):** Sistema de rachas con animaciones en `framer-motion` que motivan el registro diario de transacciones.
+- **📱 Navegación Omnicanal:** Interfaz adaptativa con Bottom Tab Bar para móviles y Sidebar elegante para escritorio.
 - **📊 Analíticas Interactivas y Dinámicas:** Gráficos fluidos y responsivos construidos con Recharts que adaptan automáticamente los balances y muestran comparativas de Ingresos vs Gastos en tiempo real.
-- **📱 Progressive Web App (PWA):** Instalable en cualquier dispositivo móvil (iOS/Android), con soporte para navegación offline, manifiesto nativo y cacheo predictivo mediante Service Workers (`next-pwa`).
-- **📥 Exportación de Reportes a CSV:** Descarga el historial financiero filtrado con un solo clic, sin dependencias pesadas, utilizando la API nativa de JavaScript.
-- **✨ UX/UI Premium:** Diseño enfocado en el detalle con *Dark Mode* por defecto, micro-interacciones con **Framer Motion**, y sistema centralizado de notificaciones (*Toasts*) usando **Sonner**.
-- **🏗️ Clean Architecture:** Frontend escalable dividido en capas de Servicios (Manejo de Base de Datos) y Componentes de Presentación.
+- **📥 Exportación de Reportes a CSV:** Descarga el historial financiero filtrado con un solo clic, utilizando la API nativa de JavaScript.
+- **✨ UX/UI Premium & PWA:** Diseño *Dark Mode* con micro-interacciones, notificaciones usando **Sonner**, e instalable nativamente (Progressive Web App).
+- **🏗️ Clean Architecture:** Frontend escalable dividido en capas de Servicios y Componentes de Presentación.
 
 ---
 
@@ -25,7 +30,7 @@ Vortex Finance es una plataforma moderna de gestión financiera diseñada para f
 | **Framework Base** | Next.js 16.2 (App Router) |
 | **Estilos & UI** | Tailwind CSS v4, Lucide React |
 | **Backend & Base de Datos** | InsForge (SDK) |
-| **Inteligencia Artificial** | LM Studio (API REST compatible con OpenAI) |
+| **Inteligencia Artificial** | LM Studio (Gemma 4) con Modos Contextuales |
 | **Animaciones** | Framer Motion |
 | **Visualización de Datos** | Recharts |
 | **Notificaciones** | Sonner |

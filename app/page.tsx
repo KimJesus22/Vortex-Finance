@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { insforge } from "@/lib/insforge";
-import { LogOut, User, Flame } from "lucide-react";
+import { LogOut, User, Flame, Plane, CreditCard, Calendar, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -238,7 +238,50 @@ export default function Dashboard() {
 
         <DashboardCharts transactions={filteredTransactions} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
+        {/* Explorar Módulos */}
+        <div className="flex flex-col gap-4 mt-2">
+          <h2 className="text-xl font-bold text-neutral-100 flex items-center gap-2 px-1">
+            Explorar Módulos
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <Link href="/trips" className="bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800 hover:border-emerald-500/50 rounded-3xl p-6 transition-all duration-300 group shadow-xl">
+              <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Plane size={24} strokeWidth={2.5} />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 flex items-center justify-between">
+                Viajes Compartidos
+                <ChevronRight size={18} className="text-neutral-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">Divide gastos de viaje con amigos equitativamente.</p>
+            </Link>
+
+            <Link href="/debts" className="bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800 hover:border-rose-500/50 rounded-3xl p-6 transition-all duration-300 group shadow-xl">
+              <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <CreditCard size={24} strokeWidth={2.5} />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 flex items-center justify-between">
+                Control de Deudas
+                <ChevronRight size={18} className="text-neutral-500 group-hover:text-rose-400 group-hover:translate-x-1 transition-all" />
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">Registra y liquida préstamos o tarjetas paso a paso.</p>
+            </Link>
+
+            <Link href="/subscriptions" className="bg-neutral-900/60 hover:bg-neutral-800/80 border border-neutral-800 hover:border-indigo-500/50 rounded-3xl p-6 transition-all duration-300 group shadow-xl">
+              <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Calendar size={24} strokeWidth={2.5} />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 flex items-center justify-between">
+                Gastos Fijos
+                <ChevronRight size={18} className="text-neutral-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">Aplica nóminas o suscripciones recurrentes al instante.</p>
+            </Link>
+
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
           
           <TransactionForm 
             editingTransaction={editingTransaction}
