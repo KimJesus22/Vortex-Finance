@@ -13,6 +13,7 @@ import FloatingAdvisor from "@/components/FloatingAdvisor";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionHistory from "@/components/TransactionHistory";
 import SavingsGoal from "@/components/SavingsGoal";
+import QuickActions from "@/components/QuickActions";
 import { TransactionService, Transaction } from "@/lib/services/transactionService";
 
 export default function Dashboard() {
@@ -165,6 +166,8 @@ export default function Dashboard() {
             ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
+
+        <QuickActions onQuickSave={handleSaveTransaction} />
 
         <SavingsGoal currentBalance={currentBalance} />
 
