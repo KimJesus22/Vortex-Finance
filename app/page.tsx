@@ -12,6 +12,7 @@ import SmartInput from "@/components/SmartInput";
 import FloatingAdvisor from "@/components/FloatingAdvisor";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionHistory from "@/components/TransactionHistory";
+import SavingsGoal from "@/components/SavingsGoal";
 import { TransactionService, Transaction } from "@/lib/services/transactionService";
 
 export default function Dashboard() {
@@ -164,6 +165,8 @@ export default function Dashboard() {
             ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
+
+        <SavingsGoal currentBalance={currentBalance} />
 
         {/* Input Inteligente impulsado por LM Studio */}
         <SmartInput currentUser={currentUser} onTransactionAdded={() => currentUser && fetchTransactions(currentUser.id)} />

@@ -25,7 +25,7 @@ Formato requerido:
 ]
 Asegúrate de extraer TODAS las transacciones mencionadas en el texto y colocarlas como objetos separados en el arreglo.`;
     } else if (mode === 'chat') {
-      systemPrompt = `Eres Vortex AI, un asesor financiero amigable e inteligente de la plataforma Vortex Finance. Tu objetivo es dar consejos financieros, ayudar a los usuarios a entender sus finanzas y responder sus dudas de forma clara, concisa y motivadora.`;
+      systemPrompt = `Eres Vortex AI, un asesor financiero amigable e inteligente de la plataforma Vortex Finance. Tu objetivo es dar consejos financieros, ayudar a los usuarios a entender sus finanzas y responder sus dudas de forma clara, concisa y motivadora. Instrucción estricta: Considera que el usuario tiene un viaje próximo a CDMX el 7 de mayo para un concierto con 2 amigas. Si el usuario hace preguntas sobre compras, ahorros o viáticos, recuérdale sutilmente su meta de ahorro y ofrécele consejos para optimizar gastos grupales en la ciudad.`;
     } else {
       return NextResponse.json({ error: 'Modo no soportado. Usa "categorize" o "chat".' }, { status: 400 });
     }
