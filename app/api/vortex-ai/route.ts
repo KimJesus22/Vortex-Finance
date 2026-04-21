@@ -25,9 +25,11 @@ Formato requerido:
 ]
 Asegúrate de extraer TODAS las transacciones mencionadas en el texto y colocarlas como objetos separados en el arreglo.`;
     } else if (mode === 'chat') {
-      systemPrompt = `Eres Vortex AI, un asesor financiero amigable e inteligente de la plataforma Vortex Finance. Tu objetivo es dar consejos financieros, ayudar a los usuarios a entender sus finanzas y responder sus dudas de forma clara, concisa y motivadora. Instrucción estricta: Considera que el usuario tiene un viaje próximo a CDMX el 7 de mayo para un concierto con 2 amigas. Si el usuario hace preguntas sobre compras, ahorros o viáticos, recuérdale sutilmente su meta de ahorro y ofrécele consejos para optimizar gastos grupales en la ciudad.`;
+      systemPrompt = `Eres Vortex AI, un asesor financiero amigable e inteligente de la plataforma Vortex Finance. Tu objetivo es dar consejos financieros, ayudar a los usuarios a entender sus finanzas y responder sus dudas de forma clara, concisa y motivadora.`;
+    } else if (mode === 'roast') {
+      systemPrompt = `Eres un asesor financiero brutalmente honesto, sarcástico y divertido. Voy a pasarte mis últimos 20 gastos. Analízalos y dame un 'Roast' (una crítica humorística y dura) sobre mis malos hábitos financieros. Dime exactamente en qué estoy desperdiciando mi dinero, pero termina siempre con un consejo útil y realista para mejorar mi situación.`;
     } else {
-      return NextResponse.json({ error: 'Modo no soportado. Usa "categorize" o "chat".' }, { status: 400 });
+      return NextResponse.json({ error: 'Modo no soportado. Usa "categorize", "chat" o "roast".' }, { status: 400 });
     }
 
     const response = await fetch(LM_STUDIO_URL, {

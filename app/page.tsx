@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { insforge } from "@/lib/insforge";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Flame } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -127,6 +128,40 @@ export default function Dashboard() {
     return curr.type === "ingreso" ? acc + Number(curr.amount) : acc - Number(curr.amount);
   }, 0);
 
+  // Sistema de Rachas (Streaks)
+  const streakDays = useMemo(() => {
+    if (transactions.length === 0) return 0;
+    
+    // Obtener fechas locales sin hora, formato YYYY-MM-DD
+    const uniqueDatesStr = Array.from(new Set(transactions.map(t => {
+      const d = new Date(t.created_at);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }))).sort((a, b) => b.localeCompare(a));
+    
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    const firstDate = new Date(uniqueDatesStr[0] + "T00:00:00");
+    const diffTime = today.getTime() - firstDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+    
+    if (diffDays > 1) return 0; // Streak perdida
+    
+    let expectedDate = firstDate;
+    for (const dateStr of uniqueDatesStr) {
+      const date = new Date(dateStr + "T00:00:00");
+      if (date.getTime() === expectedDate.getTime()) {
+        streak++;
+        expectedDate.setDate(expectedDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  }, [transactions]);
+
   if (authChecking) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
@@ -141,17 +176,44 @@ export default function Dashboard() {
         
         {/* Cabecera del Usuario */}
         <div className="flex justify-between items-center px-2">
-          <div className="flex items-center gap-3 text-neutral-400 text-sm">
-            <Link href="/profile" className="p-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-full border border-emerald-500/20 transition-colors" title="Ver Perfil">
-              <User size={18} />
-            </Link>
-            <span>Hola, <span className="text-neutral-100 font-medium">{currentUser?.profile?.name || currentUser?.email}</span></span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 text-neutral-400 text-sm">
+              <Link href="/profile" className="p-2 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 rounded-full border border-emerald-500/20 transition-colors" title="Ver Perfil">
+                <User size={18} />
+              </Link>
+              <span className="hidden sm:inline">Hola, <span className="text-neutral-100 font-medium">{currentUser?.profile?.name || currentUser?.email?.split('@')[0]}</span></span>
+            </div>
+
+            {/* Widget de Racha (Streak) */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={streakDays}
+                initial={{ scale: 0.8, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-lg ${
+                  streakDays > 0 
+                    ? "bg-orange-500/10 border-orange-500/30 text-orange-400 shadow-orange-500/10" 
+                    : "bg-neutral-900 border-neutral-800 text-neutral-500"
+                }`}
+                title="Días consecutivos registrando transacciones"
+              >
+                <motion.div
+                  animate={streakDays > 0 ? { rotate: [0, -10, 10, -10, 10, 0] } : {}}
+                  transition={{ repeat: Infinity, duration: 2, repeatDelay: 3 }}
+                >
+                  <Flame size={16} className={streakDays > 0 ? "fill-orange-400/50" : ""} />
+                </motion.div>
+                <span className="text-sm font-bold">{streakDays} <span className="hidden sm:inline">Días</span></span>
+              </motion.div>
+            </AnimatePresence>
           </div>
+
           <button 
             onClick={handleLogout}
             className="flex items-center gap-2 text-sm text-neutral-400 hover:text-rose-400 transition-colors bg-neutral-900/50 hover:bg-neutral-800 py-2 px-4 rounded-full border border-neutral-800"
           >
-            <LogOut size={16} /> Cerrar Sesión
+            <LogOut size={16} /> <span className="hidden sm:inline">Cerrar Sesión</span>
           </button>
         </div>
 

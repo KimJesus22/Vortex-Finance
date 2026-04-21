@@ -7,6 +7,8 @@ export type Transaction = {
   type: "ingreso" | "gasto";
   category: string;
   created_at: string;
+  is_recurring?: boolean;
+  frequency?: string | null;
 };
 
 export const TransactionService = {
@@ -15,6 +17,7 @@ export const TransactionService = {
       .from("transactions")
       .select("*")
       .eq("user_id", userId)
+      .eq("is_recurring", false)
       .order("created_at", { ascending: false });
     
     if (error) throw error;

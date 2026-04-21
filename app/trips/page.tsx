@@ -15,13 +15,11 @@ type Participant = {
 };
 
 export default function TripsPage() {
-  const [tripName, setTripName] = useState('Concierto CDMX');
-  const [numParticipants, setNumParticipants] = useState(3);
+  const [tripName, setTripName] = useState('');
+  const [numParticipants, setNumParticipants] = useState(1);
   
   const [participants, setParticipants] = useState<Participant[]>([
-    { id: '1', name: 'Persona 1' },
-    { id: '2', name: 'Persona 2' },
-    { id: '3', name: 'Persona 3' },
+    { id: '1', name: 'Participante 1' },
   ]);
 
   const [expenses, setExpenses] = useState<Expense[]>([]);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { insforge } from "@/lib/insforge";
-import { Lock, LogOut, ArrowLeft, User } from "lucide-react";
+import { Lock, LogOut, ArrowLeft, User, Flame, X } from "lucide-react";
 import Link from "next/link";
 
 export default function Profile() {
@@ -15,6 +15,11 @@ export default function Profile() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Roast Mode State
+  const [showRoastModal, setShowRoastModal] = useState(false);
+  const [roastLoading, setRoastLoading] = useState(false);
+  const [roastMessage, setRoastMessage] = useState("");
 
   useEffect(() => {
     const checkUser = async () => {
@@ -50,6 +55,50 @@ export default function Profile() {
     }
     
     setIsUpdating(false);
+  };
+
+  const handleRoast = async () => {
+    setShowRoastModal(true);
+    setRoastLoading(true);
+    setRoastMessage("");
+    
+    try {
+      const { data, error } = await insforge.database
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        setRoastMessage("Ni siquiera tienes gastos registrados. Eres tan aburrido que ni siquiera la IA puede criticarte.");
+        setRoastLoading(false);
+        return;
+      }
+
+      const expensesText = data.map(t => `${t.type === 'ingreso' ? '+' : '-'}$${t.amount} (${t.category})`).join(', ');
+
+      const aiResponse = await fetch('/api/vortex-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'roast',
+          message: `Aquí están mis últimos movimientos: ${expensesText}`
+        })
+      });
+
+      const aiData = await aiResponse.json();
+      if (!aiResponse.ok) throw new Error(aiData.error || 'Error en IA');
+
+      setRoastMessage(aiData.reply);
+    } catch (err: any) {
+      console.error(err);
+      setRoastMessage("Parece que te salvaste. La IA tuvo un error al analizar tu desastre financiero.");
+    } finally {
+      setRoastLoading(false);
+    }
   };
 
   if (loading) {
@@ -125,9 +174,59 @@ export default function Profile() {
               {isUpdating ? "Enviando..." : "Solicitar Cambio de Contraseña"}
             </button>
           </div>
+          </div>
+        </div>
+
+        {/* Sección Oculta: Roast de la IA */}
+        <div className="bg-rose-950/20 backdrop-blur-xl rounded-3xl p-8 border border-rose-900/30 shadow-xl relative mt-2 text-center">
+          <h2 className="text-xl font-semibold mb-2 text-rose-400 flex items-center justify-center gap-2">
+            <Flame size={20} />
+            Modo Brutalidad
+          </h2>
+          <p className="text-sm text-neutral-400 mb-6">Deja que la IA analice tus últimos 20 gastos y te diga sus verdades en un tono sarcástico.</p>
+          <button
+            onClick={handleRoast}
+            className="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-rose-500/20"
+          >
+            Evaluar mi realidad
+          </button>
         </div>
 
       </div>
+
+      {/* Roast Modal */}
+      {showRoastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-neutral-900 border-2 border-rose-600/50 w-full max-w-lg rounded-3xl p-8 shadow-[0_0_50px_-12px_rgba(225,29,72,0.5)] animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-black text-rose-500 flex items-center gap-2">
+                <Flame size={28} /> El Veredicto
+              </h2>
+              <button onClick={() => setShowRoastModal(false)} className="text-neutral-500 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="bg-neutral-950 rounded-2xl p-6 min-h-[150px] border border-neutral-800 text-neutral-200 text-lg leading-relaxed whitespace-pre-wrap max-h-[50vh] overflow-y-auto">
+              {roastLoading ? (
+                <div className="flex flex-col items-center justify-center h-full text-rose-400/50 gap-4 py-8">
+                  <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-sm animate-pulse">Analizando tu desastre financiero...</p>
+                </div>
+              ) : (
+                roastMessage
+              )}
+            </div>
+            
+            <button 
+              onClick={() => setShowRoastModal(false)}
+              className="mt-6 w-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-4 rounded-xl transition-colors"
+            >
+              Aceptar mi triste realidad
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
