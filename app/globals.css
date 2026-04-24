@@ -24,3 +24,47 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Privacy Mode Styles */
+.privacy-blur {
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.privacy-mode-active .privacy-blur {
+  filter: blur(8px) !important;
+  opacity: 0.5 !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* Print Optimization */
+@media print {
+  nav, aside, button, .no-print, .sonner-toaster {
+    display: none !important;
+  }
+  body, html {
+    background: white !important;
+    color: black !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  main, .flex-1 {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+  .md\:pl-64 {
+    padding-left: 0 !important;
+  }
+}
+
+/* Skeleton Loaders */
+@keyframes skeleton-pulse {
+  0% { background-color: rgba(38, 38, 38, 0.5); }
+  50% { background-color: rgba(64, 64, 64, 0.7); }
+  100% { background-color: rgba(38, 38, 38, 0.5); }
+}
+
+.animate-skeleton {
+  animation: skeleton-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

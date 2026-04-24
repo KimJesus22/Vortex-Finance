@@ -4,6 +4,8 @@ import { Search, Filter, Edit2, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Transaction } from "@/lib/services/transactionService";
 import ExportButton from "@/components/ExportButton";
+import ReportButton from "@/components/ReportButton";
+import { TransactionSkeleton } from "@/components/Skeleton";
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
@@ -17,6 +19,7 @@ interface TransactionHistoryProps {
   editingId: string | null;
   onEdit: (t: Transaction) => void;
   onDelete: (id: string) => void;
+  userName: string;
 }
 
 export default function TransactionHistory({
@@ -30,7 +33,8 @@ export default function TransactionHistory({
   setFilterMonth,
   editingId,
   onEdit,
-  onDelete
+  onDelete,
+  userName
 }: TransactionHistoryProps) {
 
   // Computed state
@@ -87,13 +91,14 @@ export default function TransactionHistory({
           <option value="11">Diciembre</option>
         </select>
         
-        <ExportButton transactions={filteredTransactions} />
+        <div className="flex gap-2">
+          <ExportButton transactions={filteredTransactions} />
+          <ReportButton transactions={filteredTransactions} userName={userName} />
+        </div>
       </div>
 
       {loading ? (
-        <div className="flex flex-1 justify-center items-center py-20">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
+        <TransactionSkeleton />
       ) : filteredTransactions.length === 0 ? (
         <div className="text-center text-neutral-500 flex-1 py-16 flex flex-col items-center justify-center">
           <Filter className="w-12 h-12 text-neutral-800 mb-3" />
@@ -134,7 +139,7 @@ export default function TransactionHistory({
               </div>
               
               <div className="flex items-center justify-between w-full sm:w-auto gap-4 pl-16 sm:pl-0">
-                <div className={`font-semibold text-xl tracking-tight ${t.type === "ingreso" ? "text-emerald-400" : "text-rose-400"}`}>
+                <div className={`font-semibold text-xl tracking-tight privacy-blur ${t.type === "ingreso" ? "text-emerald-400" : "text-rose-400"}`}>
                   {t.type === "ingreso" ? "+" : "-"}${Number(t.amount).toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
                 

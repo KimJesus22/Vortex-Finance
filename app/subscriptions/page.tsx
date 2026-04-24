@@ -5,6 +5,7 @@ import { insforge } from '@/lib/insforge';
 import { Repeat, ArrowDownCircle, ArrowUpCircle, PlayCircle, Plus, Wallet, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { Transaction } from '@/lib/services/transactionService';
+import ReportButton from '@/components/ReportButton';
 
 export default function SubscriptionsPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -150,19 +151,25 @@ export default function SubscriptionsPage() {
             </h1>
             <p className="text-neutral-400">Tus suscripciones y cobros automáticos en piloto automático.</p>
           </div>
-          
-          <button 
-            onClick={handleApplyMonthlyCharges}
-            disabled={isProcessing || subscriptions.length === 0}
-            className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:-translate-y-1"
-          >
-            {isProcessing ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <PlayCircle size={20} />
-            )}
-            Aplicar cobros del mes
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button 
+              onClick={handleApplyMonthlyCharges}
+              disabled={isProcessing || subscriptions.length === 0}
+              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-indigo-500/20 transition-all hover:-translate-y-1"
+            >
+              {isProcessing ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <PlayCircle size={20} />
+              )}
+              Aplicar cobros del mes
+            </button>
+
+            <ReportButton 
+              transactions={subscriptions} 
+              userName={currentUser?.profile?.name || currentUser?.email?.split('@')[0]} 
+            />
+          </div>
         </div>
 
         <div className="flex justify-end">
@@ -200,7 +207,7 @@ export default function SubscriptionsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="font-black text-rose-400 text-lg">${sub.amount.toLocaleString('es-US', { minimumFractionDigits: 2 })}</span>
+                      <span className="font-black text-rose-400 text-lg privacy-blur">${sub.amount.toLocaleString('es-US', { minimumFractionDigits: 2 })}</span>
                       <button onClick={() => deleteSubscription(sub.id)} className="text-neutral-600 hover:text-rose-500 transition-colors">✕</button>
                     </div>
                   </div>
@@ -232,7 +239,7 @@ export default function SubscriptionsPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="font-black text-emerald-400 text-lg">${sub.amount.toLocaleString('es-US', { minimumFractionDigits: 2 })}</span>
+                      <span className="font-black text-emerald-400 text-lg privacy-blur">${sub.amount.toLocaleString('es-US', { minimumFractionDigits: 2 })}</span>
                       <button onClick={() => deleteSubscription(sub.id)} className="text-neutral-600 hover:text-rose-500 transition-colors">✕</button>
                     </div>
                   </div>

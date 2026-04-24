@@ -132,7 +132,7 @@ export default function FloatingAdvisor({ currentUser }: { currentUser: any }) {
               <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center border ${msg.role === 'user' ? 'bg-neutral-800 border-neutral-700 text-neutral-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
                 {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
               </div>
-              <div className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-emerald-600 text-white rounded-tr-sm shadow-emerald-900/20' : 'bg-neutral-800/80 text-neutral-200 rounded-tl-sm shadow-black/20'}`}>
+              <div className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm privacy-blur ${msg.role === 'user' ? 'bg-emerald-600 text-white rounded-tr-sm shadow-emerald-900/20' : 'bg-neutral-800/80 text-neutral-200 rounded-tl-sm shadow-black/20'}`}>
                 {msg.content}
               </div>
             </div>

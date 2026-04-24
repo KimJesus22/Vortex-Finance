@@ -57,7 +57,7 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
       className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-2"
     >
       {/* Gráfico Circular (Gastos) */}
-      <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700">
+      <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700 privacy-blur">
         <h3 className="text-neutral-400 font-medium mb-2 text-center">Distribución de Gastos</h3>
         <div className="flex-grow w-full relative">
           {pieData.length > 0 ? (
@@ -92,7 +92,7 @@ export default function DashboardCharts({ transactions }: DashboardChartsProps) 
       </div>
 
       {/* Gráfico de Barras (Resumen) */}
-      <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700">
+      <div className="bg-neutral-900/50 backdrop-blur-xl rounded-3xl p-6 border border-neutral-800 shadow-xl h-80 flex flex-col transition-all hover:border-neutral-700 privacy-blur">
         <h3 className="text-neutral-400 font-medium mb-4 text-center">Balance Mensual</h3>
         <div className="flex-grow w-full relative">
           <ResponsiveContainer width="100%" height="100%" minHeight={200} minWidth={200}>

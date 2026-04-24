@@ -163,7 +163,7 @@ export default function DebtsDashboard() {
           
           <div className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-4 md:min-w-[250px] shadow-lg">
             <span className="text-neutral-500 text-sm font-medium uppercase tracking-wider">Deuda Global Activa</span>
-            <div className="text-3xl font-black text-white mt-1">
+            <div className="text-3xl font-black text-white mt-1 privacy-blur">
               ${totalGlobalDebt.toLocaleString('es-US', { minimumFractionDigits: 2 })}
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function DebtsDashboard() {
                   <div className="space-y-4">
                     <div>
                       <span className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Saldo Restante</span>
-                      <div className="text-2xl font-black text-rose-400 mt-0.5">
+                      <div className="text-2xl font-black text-rose-400 mt-0.5 privacy-blur">
                         ${debt.current_balance.toLocaleString('es-US', { minimumFractionDigits: 2 })}
                       </div>
                     </div>
@@ -218,7 +218,7 @@ export default function DebtsDashboard() {
                     <div className="pt-4 border-t border-neutral-800/50">
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-emerald-400 font-medium">Pagado: {percentage.toFixed(1)}%</span>
-                        <span className="text-neutral-500">${paidAmount.toLocaleString('es-US', { maximumFractionDigits: 0 })}</span>
+                        <span className="text-neutral-500 privacy-blur">${paidAmount.toLocaleString('es-US', { maximumFractionDigits: 0 })}</span>
                       </div>
                       <div className="w-full h-3 bg-neutral-950 rounded-full overflow-hidden border border-neutral-800">
                         <div 
@@ -229,7 +229,7 @@ export default function DebtsDashboard() {
                     </div>
 
                     <div className="flex items-center justify-between pt-2 text-xs text-neutral-400">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 privacy-blur">
                         <Wallet size={14} /> Total: ${debt.total_amount.toLocaleString('es-US')}
                       </div>
                       {debt.interest_rate && (

@@ -29,6 +29,7 @@ export const viewport: Viewport = {
 };
 
 import Navigation from "@/components/Navigation";
+import { PrivacyProvider } from "@/components/PrivacyProvider";
 
 export default function RootLayout({
   children,
@@ -42,11 +43,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100" suppressHydrationWarning>
-        <Navigation />
-        <div className="flex-1 md:pl-64 pb-20 md:pb-0 w-full">
-          {children}
-        </div>
-        <Toaster theme="dark" position="bottom-right" richColors />
+        <PrivacyProvider>
+          <Navigation />
+          <div className="flex-1 md:pl-64 pb-20 md:pb-0 w-full">
+            {children}
+          </div>
+          <Toaster theme="dark" position="bottom-right" richColors />
+        </PrivacyProvider>
       </body>
     </html>
   );

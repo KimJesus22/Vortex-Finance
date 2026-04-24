@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { vortexCache } from '@/lib/cache';
 
 type Expense = {
   id: string;
@@ -26,6 +27,28 @@ export default function TripsPage() {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseAmount, setExpenseAmount] = useState<number | ''>('');
   const [expensePayer, setExpensePayer] = useState<string>('1');
+
+  // Load from cache on mount
+  useEffect(() => {
+    const cachedTrip = vortexCache.get<any>('current_trip');
+    if (cachedTrip) {
+      if (cachedTrip.tripName) setTripName(cachedTrip.tripName);
+      if (cachedTrip.participants) {
+        setParticipants(cachedTrip.participants);
+        setNumParticipants(cachedTrip.participants.length);
+      }
+      if (cachedTrip.expenses) setExpenses(cachedTrip.expenses);
+    }
+  }, []);
+
+  // Save to cache whenever data changes
+  useEffect(() => {
+    vortexCache.set('current_trip', {
+      tripName,
+      participants,
+      expenses
+    });
+  }, [tripName, participants, expenses]);
 
   const handleNumParticipantsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let num = parseInt(e.target.value);
@@ -271,7 +294,7 @@ export default function TripsPage() {
                           <span className="text-xs text-neutral-500">Pagado por {payer}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="font-semibold text-emerald-400">${exp.amount.toFixed(2)}</span>
+                          <span className="font-semibold text-emerald-400 privacy-blur">${exp.amount.toFixed(2)}</span>
                           <button 
                             onClick={() => deleteExpense(exp.id)}
                             className="text-neutral-600 hover:text-red-400 transition-colors p-1"
@@ -299,8 +322,8 @@ export default function TripsPage() {
               
               <div className="mb-6 pb-6 border-b border-neutral-800/50 text-center">
                 <p className="text-neutral-400 text-sm mb-1">Costo Total del Viaje</p>
-                <p className="text-4xl font-bold text-white tracking-tight">${totalTripCost.toFixed(2)}</p>
-                <p className="text-neutral-500 text-sm mt-2">
+                <p className="text-4xl font-bold text-white tracking-tight privacy-blur">${totalTripCost.toFixed(2)}</p>
+                <p className="text-neutral-500 text-sm mt-2 privacy-blur">
                   ${(totalTripCost / (participants.length || 1)).toFixed(2)} por persona
                 </p>
               </div>
@@ -320,7 +343,7 @@ export default function TripsPage() {
                           <span className="font-medium text-neutral-200 text-sm">{tx.from}</span>
                           <span className="text-xs text-neutral-500">le debe a <span className="text-neutral-300">{tx.to}</span></span>
                         </div>
-                        <span className="font-bold text-red-400 bg-red-400/10 px-3 py-1.5 rounded-lg text-sm">
+                        <span className="font-bold text-red-400 bg-red-400/10 px-3 py-1.5 rounded-lg text-sm privacy-blur">
                           ${tx.amount.toFixed(2)}
                         </span>
                       </div>

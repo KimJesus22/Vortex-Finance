@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { insforge } from "@/lib/insforge";
-import { LogOut, User, Flame, Plane, CreditCard, Calendar, ChevronRight } from "lucide-react";
+import { LogOut, User, Flame, Plane, CreditCard, Calendar, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { usePrivacy } from "@/components/PrivacyProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -16,8 +17,11 @@ import TransactionHistory from "@/components/TransactionHistory";
 import SavingsGoal from "@/components/SavingsGoal";
 import QuickActions from "@/components/QuickActions";
 import { TransactionService, Transaction } from "@/lib/services/transactionService";
+import { BalanceSkeleton, ChartSkeleton } from "@/components/Skeleton";
+import { vortexCache } from "@/lib/cache";
 
 export default function Dashboard() {
+  const { isPrivate, togglePrivacy } = usePrivacy();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState(true);
@@ -63,10 +67,20 @@ export default function Dashboard() {
   }, [router]);
 
   const fetchTransactions = async (userId: string) => {
-    setLoading(true);
+    // 1. Try to load from cache first for instant UI
+    const cachedData = vortexCache.get<Transaction[]>(`transactions_${userId}`);
+    if (cachedData) {
+      setTransactions(cachedData);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const data = await TransactionService.fetchTransactions(userId);
       setTransactions(data);
+      // 2. Save to cache for next time
+      vortexCache.set(`transactions_${userId}`, data);
     } catch (error: any) {
       console.error(error);
       toast.error("Error cargando transacciones");
@@ -184,6 +198,19 @@ export default function Dashboard() {
               <span className="hidden sm:inline">Hola, <span className="text-neutral-100 font-medium">{currentUser?.profile?.name || currentUser?.email?.split('@')[0]}</span></span>
             </div>
 
+            {/* Privacy Toggle */}
+            <button
+              onClick={togglePrivacy}
+              className={`p-2 rounded-full border transition-all duration-300 ${
+                isPrivate 
+                  ? "bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-lg shadow-amber-500/10" 
+                  : "bg-neutral-900 border-neutral-800 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
+              }`}
+              title={isPrivate ? "Desactivar Modo Privacidad" : "Activar Modo Privacidad"}
+            >
+              {isPrivate ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+
             {/* Widget de Racha (Streak) */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -218,16 +245,20 @@ export default function Dashboard() {
         </div>
 
         {/* Panel Superior: Balance Total Dinámico */}
-        <div className="bg-neutral-900 rounded-3xl p-8 md:p-10 border border-neutral-800 shadow-2xl text-center relative overflow-hidden group">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-          
-          <h1 className="text-lg md:text-xl text-neutral-400 font-medium mb-3 relative z-10">
-            {searchQuery || filterType !== "todos" || filterMonth !== "todos" ? "Balance de Selección" : "Balance Total"}
-          </h1>
-          <p className={`text-6xl md:text-7xl font-bold tracking-tight relative z-10 transition-colors duration-500 ${currentBalance >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-            ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </p>
-        </div>
+        {loading ? (
+          <BalanceSkeleton />
+        ) : (
+          <div className="bg-neutral-900 rounded-3xl p-8 md:p-10 border border-neutral-800 shadow-2xl text-center relative overflow-hidden group">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+            
+            <h1 className="text-lg md:text-xl text-neutral-400 font-medium mb-3 relative z-10">
+              {searchQuery || filterType !== "todos" || filterMonth !== "todos" ? "Balance de Selección" : "Balance Total"}
+            </h1>
+            <p className={`text-6xl md:text-7xl font-bold tracking-tight relative z-10 transition-colors duration-500 privacy-blur ${currentBalance >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+              ${currentBalance.toLocaleString("es-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </p>
+          </div>
+        )}
 
         <QuickActions onQuickSave={handleSaveTransaction} />
 
@@ -236,7 +267,11 @@ export default function Dashboard() {
         {/* Input Inteligente impulsado por LM Studio */}
         <SmartInput currentUser={currentUser} onTransactionAdded={() => currentUser && fetchTransactions(currentUser.id)} />
 
-        <DashboardCharts transactions={filteredTransactions} />
+        {loading ? (
+          <ChartSkeleton />
+        ) : (
+          <DashboardCharts transactions={filteredTransactions} />
+        )}
 
         {/* Explorar Módulos */}
         <div className="flex flex-col gap-4 mt-2">
@@ -301,6 +336,7 @@ export default function Dashboard() {
             editingId={editingTransaction?.id || null}
             onEdit={setEditingTransaction}
             onDelete={handleDeleteTransaction}
+            userName={currentUser?.profile?.name || currentUser?.email?.split('@')[0]}
           />
 
         </div>

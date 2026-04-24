@@ -74,7 +74,7 @@ export default function SavingsGoal({ currentBalance }: SavingsGoalProps) {
       <div className="space-y-3 relative z-10">
         <div className="flex justify-between text-sm font-semibold">
           <span className="text-neutral-400">Progreso actual</span>
-          <span className="text-cyan-400 font-bold text-lg">{progressPercentage.toFixed(1)}%</span>
+          <span className="text-cyan-400 font-bold text-lg privacy-blur">{progressPercentage.toFixed(1)}%</span>
         </div>
         <div className="w-full h-4 bg-neutral-950 rounded-full overflow-hidden border border-neutral-800 p-0.5">
           <div 
@@ -84,7 +84,7 @@ export default function SavingsGoal({ currentBalance }: SavingsGoalProps) {
             <div className="absolute inset-0 bg-white/20 w-full animate-pulse"></div>
           </div>
         </div>
-        <div className="text-right text-xs text-neutral-500 font-medium">
+        <div className="text-right text-xs text-neutral-500 font-medium privacy-blur">
           ${Math.max(currentBalance, 0).toLocaleString()} / ${goalAmount.toLocaleString()}
         </div>
       </div>

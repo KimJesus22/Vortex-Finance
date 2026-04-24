@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Plane, CreditCard, Calendar, User } from "lucide-react";
+import { Home, Plane, CreditCard, Calendar, User, Eye, EyeOff } from "lucide-react";
+import { usePrivacy } from "@/components/PrivacyProvider";
 
 const navItems = [
   { name: "Inicio", path: "/", icon: Home },
@@ -13,6 +14,7 @@ const navItems = [
 ];
 
 export default function Navigation() {
+  const { isPrivate, togglePrivacy } = usePrivacy();
   const pathname = usePathname();
 
   // No mostrar la navegación en pantallas de autenticación
@@ -78,7 +80,19 @@ export default function Navigation() {
           })}
         </div>
         
-        <div className="p-6 mt-auto">
+        <div className="p-6 mt-auto space-y-4">
+          <button
+            onClick={togglePrivacy}
+            className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border transition-all duration-300 ${
+              isPrivate 
+                ? "bg-amber-500/10 border-amber-500/30 text-amber-400 shadow-lg shadow-amber-500/10" 
+                : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800"
+            }`}
+          >
+            {isPrivate ? <EyeOff size={18} /> : <Eye size={18} />}
+            <span className="text-sm font-medium">{isPrivate ? "Privacidad ON" : "Privacidad OFF"}</span>
+          </button>
+
           <div className="bg-neutral-900/40 p-4 rounded-2xl border border-neutral-800/50 text-center">
             <p className="text-xs text-neutral-500 font-medium">Vortex Finance v1.0</p>
           </div>
